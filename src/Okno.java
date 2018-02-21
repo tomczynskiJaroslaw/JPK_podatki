@@ -14,45 +14,28 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
 public class Okno{
-	private final int ileMiejsc = 5;
+	private final int ileMiejsc = 1;
 	private JButton zapisz = new JButton("zapisz");
 	private JButton dodaj = new JButton("dodaj");
+	private JPanel danePodstawowe;
 	private JPanel wszystkieZakupy;
-	
+	private JPanel wszystkieSprzedaze;
 	public Okno() {
 		
 		
 		JFrame okienko = new JFrame();
 		JTabbedPane jtp = new JTabbedPane();
 		
-		JPanel podstawoweDane = new JPanel();
-		List<JPanel> paneleDanePodstawowe = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres.PODSTAWOWE_DANE));
-		podstawoweDane.setLayout(new GridLayout(paneleDanePodstawowe.size(), 1));
-		for (JPanel p: paneleDanePodstawowe){
-			podstawoweDane.add(p);
-		}
+//		JPanel podstawoweDane = new JPanel();
+//		List<JPanel> paneleDanePodstawowe = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres.PODSTAWOWE_DANE));
+//		podstawoweDane.setLayout(new GridLayout(paneleDanePodstawowe.size(), 1));
+//		for (JPanel p: paneleDanePodstawowe){
+//			podstawoweDane.add(p);
+//		}
 		
-		JPanel sprzedaz = new JPanel();
-		List<JPanel> sprzedaze = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres.SPRZEDAZ));
-		sprzedaz.setLayout(new GridLayout(sprzedaze.size(), 1));
-		for (JPanel p: sprzedaze){
-			sprzedaz.add(p);
-		}
-		
-		wszystkieZakupy = new JPanel();
-		wszystkieZakupy.setLayout(new GridLayout(1, ileMiejsc));
-		for (int i=0;i<ileMiejsc;i++){
-			List<JPanel> zakupy = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres.ZAKUP));
-			JPanel zakup = new JPanel();
-			
-			zakup.setLayout(new GridLayout(zakupy.size()/*<-!!!!*/, 1));
-			for (JPanel p: zakupy){
-				zakup.add(p);
-			}
-			wszystkieZakupy.add(zakup);
-			System.out.println("-");
-			//panelZbiorczyWszystkichZakupow.add(new JButton("000"));
-		}
+		danePodstawowe = zrobZakladke(Zakres.PODSTAWOWE_DANE);
+		wszystkieSprzedaze = zrobZakladke(Zakres.SPRZEDAZ);
+		wszystkieZakupy = zrobZakladke(Zakres.ZAKUP);
 		
 //		dodaj.setLocation(100, 100);
 //		dodaj.setSize(100, 100);
@@ -67,17 +50,35 @@ public class Okno{
 //		zakup.add(dodaj);
 		
 		
-		jtp.addTab("podstawowe dane", podstawoweDane);
-		jtp.addTab("sprzedaze", sprzedaz);
+		jtp.addTab("podstawowe dane", danePodstawowe);
+		jtp.addTab("sprzedaze", wszystkieSprzedaze);
 		jtp.addTab("zakupy", wszystkieZakupy);
 		
 		okienko.setLayout(new BorderLayout());
 		okienko.add(jtp);
 		okienko.add(zapisz,BorderLayout.SOUTH);
-		okienko.setSize(600, 400);
+		okienko.setSize(1024, 800);
 		okienko.setLocationRelativeTo(null);
 		okienko.setVisible(true);
 		okienko.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	private JPanel zrobZakladke(Zakres zakres) {
+		JPanel wszystkiePozycje = new JPanel();
+		wszystkiePozycje.setLayout(new GridLayout(1, ileMiejsc));
+		for (int i=0;i<ileMiejsc;i++){
+			List<JPanel> zakupy = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(zakres));
+			JPanel zakup = new JPanel();
+			
+			zakup.setLayout(new GridLayout(zakupy.size()/*<-!!!!*/, 1));
+			for (JPanel p: zakupy){
+				zakup.add(p);
+			}
+			wszystkiePozycje.add(zakup);
+			System.out.println("-");
+			//panelZbiorczyWszystkichZakupow.add(new JButton("000"));
+		}
+		return wszystkiePozycje;
 	}
 	
 	public List<JPanel> produkujPanele(List<String> lista){
@@ -103,25 +104,39 @@ public class Okno{
 		dodaj.addActionListener(ac);
 	}
 	
-	public List<Zakup> zapiszDoModelu(){
-		Zakup.usunWszystkie();
-		ArrayList<String> dane = new ArrayList<>();
-		Component[] panele = wszystkieZakupy.getComponents();
+	public List<List<String>> getWpisaneDane(JPanel panel){
+		//Zakup.usunWszystkie();
+		ArrayList<List<String>> danePozycje = new ArrayList<>();
+		Component[] panele = panel.getComponents();
 		//List<Zakup> listaZakupow = new ArrayList<>();
 		for (Component c: panele){
+//			ArrayList<String> danePola = new ArrayList<>();
 			JPanel p1 = (JPanel) c;
 			Component[] wiersze = p1.getComponents();
-			List<String> zakup = new ArrayList<>();
+			List<String> uzupelnionePola = new ArrayList<>();
 			for (Component w: wiersze){
 				JPanel p2 = (JPanel) w;
 				String dana = ((JTextField) p2.getComponents()[1]).getText();
-				zakup.add(dana);
+				uzupelnionePola.add(dana);
 			}
 			//listaZakupow.add(
-			new Zakup(zakup);
+			//new Zakup(zakup);
+			danePozycje.add(uzupelnionePola);
 		}
 		
 		//System.out.println(dane.get(0));
-		return null;
+		return danePozycje;
+	}
+	
+	public List<List<String>> getZakupy(){
+		return getWpisaneDane(wszystkieZakupy);
+	}
+	
+	public List<List<String>> getSprzedaze(){
+		return getWpisaneDane(wszystkieSprzedaze);
+	}
+	
+	public List<List<String>> getDodstawoweDane(){
+		return getWpisaneDane(danePodstawowe);
 	}
 }
