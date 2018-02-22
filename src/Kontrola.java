@@ -34,7 +34,8 @@ public class Kontrola implements ActionListener{
 			
 			BibliotekaWspolnychMetod.zapiszStringDoPliku(
 					tytulyKolumnZamienNaPierwszaLinie(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres._WSZYSTKIE_))
-					+"\n"+dane_podstawowe+sprzedaze
+					+"\n"+dane_podstawowe
+					+sprzedaze
 					+podliczenieSprzedazy
 					+linia
 					+zakupy
@@ -42,7 +43,15 @@ public class Kontrola implements ActionListener{
 					, "plik.csv");
 		}
 		if (nazwa.equals("importuj")){
-			
+			String[] zakladki = BibliotekaWspolnychMetod.wczytaj("wzor.csv");
+			System.out.println(zakladki[0]+"\n---\n"+zakladki[1]+"\n---\n"+zakladki[2]);
+			//Zakladka danePodstawowe = BibliotekaWspolnychMetod.importujZeStringDanePodstawowe(zakladki[0]);
+			Zakladka sprzedaze = BibliotekaWspolnychMetod.importZeString(zakladki[1],Zakres.SPRZEDAZ);
+			Zakladka zakupy = BibliotekaWspolnychMetod.importZeString(zakladki[2],Zakres.ZAKUP);
+			//okno.importujDanePodstawowe(danePodstawowe);
+			okno.importujSprzedaze(sprzedaze);
+			okno.importujZakupy(zakupy);
+			okno.odswiezOkienko();
 		}
 		
 	}
