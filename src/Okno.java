@@ -15,40 +15,21 @@ import javax.swing.JTextField;
 
 public class Okno{
 	private final int ileMiejsc = 1;
+	private JButton importuj = new JButton("importuj");
 	private JButton zapisz = new JButton("zapisz");
 	private JButton dodaj = new JButton("dodaj");
-	private JPanel danePodstawowe;
-	private JPanel wszystkieZakupy;
-	private JPanel wszystkieSprzedaze;
+	private JButton usun = new JButton("usun");
+	private Grupa danePodstawowe;
+	private Grupa wszystkieZakupy;
+	private Grupa wszystkieSprzedaze;
 	public Okno() {
-		
 		
 		JFrame okienko = new JFrame();
 		JTabbedPane jtp = new JTabbedPane();
 		
-//		JPanel podstawoweDane = new JPanel();
-//		List<JPanel> paneleDanePodstawowe = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres.PODSTAWOWE_DANE));
-//		podstawoweDane.setLayout(new GridLayout(paneleDanePodstawowe.size(), 1));
-//		for (JPanel p: paneleDanePodstawowe){
-//			podstawoweDane.add(p);
-//		}
-		
 		danePodstawowe = zrobZakladke(Zakres.PODSTAWOWE_DANE);
 		wszystkieSprzedaze = zrobZakladke(Zakres.SPRZEDAZ);
 		wszystkieZakupy = zrobZakladke(Zakres.ZAKUP);
-		
-//		dodaj.setLocation(100, 100);
-//		dodaj.setSize(100, 100);
-//		dodaj.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				zakup.remove(zakupy.get(0));
-//				okienko.validate();
-//			}
-//		});
-//		zakup.add(dodaj);
-		
 		
 		jtp.addTab("podstawowe dane", danePodstawowe);
 		jtp.addTab("sprzedaze", wszystkieSprzedaze);
@@ -56,28 +37,74 @@ public class Okno{
 		
 		okienko.setLayout(new BorderLayout());
 		okienko.add(jtp);
+		okienko.add(importuj,BorderLayout.NORTH);
 		okienko.add(zapisz,BorderLayout.SOUTH);
+		okienko.add(dodaj,BorderLayout.EAST);
+		okienko.add(usun,BorderLayout.WEST);
 		okienko.setSize(1024, 800);
 		okienko.setLocationRelativeTo(null);
 		okienko.setVisible(true);
 		okienko.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		dodaj.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				Grupa panel = (Grupa) jtp.getSelectedComponent();
+				System.out.println(panel);
+				panel = dodajPozycje(panel);
+				okienko.validate();
+			}
+		});
+		
+		usun.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Grupa panel = (Grupa) jtp.getSelectedComponent();
+				panel = usunPozycje(panel);
+				okienko.validate();
+			}
+		});
 	}
 
-	private JPanel zrobZakladke(Zakres zakres) {
-		JPanel wszystkiePozycje = new JPanel();
+	private Grupa zrobZakladke(Zakres zakres) {
+		Grupa wszystkiePozycje = new Grupa(zakres);
 		wszystkiePozycje.setLayout(new GridLayout(1, ileMiejsc));
 		for (int i=0;i<ileMiejsc;i++){
 			List<JPanel> zakupy = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(zakres));
-			JPanel zakup = new JPanel();
+			JPanel pozycja = new JPanel();
 			
-			zakup.setLayout(new GridLayout(zakupy.size()/*<-!!!!*/, 1));
+			pozycja.setLayout(new GridLayout(zakupy.size()/*<-!!!!*/, 1));
 			for (JPanel p: zakupy){
-				zakup.add(p);
+				pozycja.add(p);
 			}
-			wszystkiePozycje.add(zakup);
-			System.out.println("-");
-			//panelZbiorczyWszystkichZakupow.add(new JButton("000"));
+			wszystkiePozycje.add(pozycja);
 		}
+		return wszystkiePozycje;
+	}
+	
+	private Grupa dodajPozycje(Grupa panel){
+		Grupa wszystkiePozycje = panel;
+		int ilePozycji = ((GridLayout) wszystkiePozycje.getLayout()).getColumns();
+		wszystkiePozycje.setLayout(new GridLayout(1, ilePozycji+1));
+		List<JPanel> pola = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(panel.getZakres()));
+		JPanel pozycja = new JPanel();
+		pozycja.setLayout(new GridLayout(pola.size()/*<-!!!!*/, 1));
+		for (JPanel p: pola){
+			pozycja.add(p);
+		}
+		wszystkiePozycje.add(pozycja);
+		return wszystkiePozycje;
+	}
+	
+	private Grupa usunPozycje(Grupa panel){
+		Grupa wszystkiePozycje = panel;
+		int ilePozycji = ((GridLayout) wszystkiePozycje.getLayout()).getColumns();
+		wszystkiePozycje.setLayout(new GridLayout(1, ilePozycji-1));
+		List<JPanel> pola = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(panel.getZakres()));
+		wszystkiePozycje.remove(wszystkiePozycje.getComponentCount()-1);
 		return wszystkiePozycje;
 	}
 	
@@ -104,13 +131,14 @@ public class Okno{
 		dodaj.addActionListener(ac);
 	}
 	
+	public void addImportujListener(ActionListener ac){
+		importuj.addActionListener(ac);
+	}
+	
 	public List<List<String>> getWpisaneDane(JPanel panel){
-		//Zakup.usunWszystkie();
 		ArrayList<List<String>> danePozycje = new ArrayList<>();
 		Component[] panele = panel.getComponents();
-		//List<Zakup> listaZakupow = new ArrayList<>();
 		for (Component c: panele){
-//			ArrayList<String> danePola = new ArrayList<>();
 			JPanel p1 = (JPanel) c;
 			Component[] wiersze = p1.getComponents();
 			List<String> uzupelnionePola = new ArrayList<>();
@@ -119,12 +147,9 @@ public class Okno{
 				String dana = ((JTextField) p2.getComponents()[1]).getText();
 				uzupelnionePola.add(dana);
 			}
-			//listaZakupow.add(
-			//new Zakup(zakup);
 			danePozycje.add(uzupelnionePola);
 		}
 		
-		//System.out.println(dane.get(0));
 		return danePozycje;
 	}
 	
@@ -138,5 +163,37 @@ public class Okno{
 	
 	public List<List<String>> getDodstawoweDane(){
 		return getWpisaneDane(danePodstawowe);
+	}
+	
+	public void setZakupy(List<List<String>> pozycje){
+		wszystkieZakupy = wprowadzZaimportowaneDane(pozycje,Zakres.ZAKUP);
+	}
+	
+	private class Grupa extends JPanel{
+		private Zakres zakres;
+		public Grupa(Zakres zakres) {
+			this.zakres=zakres;
+		}
+		public Zakres getZakres(){
+			return zakres;
+		}
+	}
+	
+	public Grupa wprowadzZaimportowaneDane(List<List<String>> pozycje, Zakres zakres) {
+		ArrayList<List<String>> danePozycje = new ArrayList<>();
+		Component[] panele = panel.getComponents();
+		for (Component c: panele){
+			JPanel p1 = (JPanel) c;
+			Component[] wiersze = p1.getComponents();
+			List<String> uzupelnionePola = new ArrayList<>();
+			for (Component w: wiersze){
+				JPanel p2 = (JPanel) w;
+				String dana = ((JTextField) p2.getComponents()[1]).getText();
+				uzupelnionePola.add(dana);
+			}
+			danePozycje.add(uzupelnionePola);
+		}
+		
+		return danePozycje;
 	}
 }

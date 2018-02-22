@@ -13,6 +13,7 @@ public class Kontrola implements ActionListener{
 		this.model=model;
 		this.okno.addZapiszListener(this);
 		this.okno.addDodajListener(this);
+		this.okno.addImportujListener(this);
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public class Kontrola implements ActionListener{
 			String zakupy = BibliotekaWspolnychMetod.exportDoString(okno.getZakupy(),Zakres.ZAKUP);
 			
 			String podliczenieSprzedazy = podliczenieSprzedazy(okno.getSprzedaze(),Zakres.SPRZEDAZ);
-			String linia = ";...\n";
+			String linia = "\n;...\n";
 			String podliczenieZakupow = podliczenieSprzedazy(okno.getZakupy(),Zakres.ZAKUP);
 			
 			BibliotekaWspolnychMetod.zapiszStringDoPliku(
@@ -39,6 +40,9 @@ public class Kontrola implements ActionListener{
 					+zakupy
 					+podliczenieZakupow
 					, "plik.csv");
+		}
+		if (nazwa.equals("importuj")){
+			
 		}
 		
 	}
