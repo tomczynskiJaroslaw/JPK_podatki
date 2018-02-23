@@ -1,9 +1,9 @@
 public enum Zakres{
-	PODSTAWOWE_DANE(0,22,new int[] {-1}),
-	SPRZEDAZ(23,60,new int[] {41}),
-	ZAKUP(63,78,new int[] {74}),
+	PODSTAWOWE_DANE(0,12,new int[] {-1}),
+	SPRZEDAZ(12,49,new int[] {29}),
+	ZAKUP(52,68,new int[] {61}),
 	
-	_WSZYSTKIE_(0,81,new int[] {-1});
+	_WSZYSTKIE_(0,68,new int[] {-1});
 	
 	int a;
 	int b;

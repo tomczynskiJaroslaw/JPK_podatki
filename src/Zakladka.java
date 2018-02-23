@@ -136,5 +136,10 @@ public class Zakladka implements List<List<String>>{
 	public void add(int index, List<String> element) {
 		lista.add(index, element);
 	}
+	
+	@Override
+	public String toString() {
+		return zakres+" "+lista.toString();
+	}
 
 }

@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.util.Scanner;
 
 
 public class BibliotekaWspolnychMetod {
+	
+	private final static int[] indexy = {0,9,11};
 	
 	public static List<String> pobierzTytulyKolumn(Zakres zakres){
 		ArrayList<String> lista = new ArrayList<>();
@@ -29,7 +32,7 @@ public class BibliotekaWspolnychMetod {
 	}
 	
 	public static String exportDoStringDanePodstawowe(List<List<String>> pozycje) {
-		int[] indexy = {0,9,12,22};
+//		int[] indexy = {0,9,12,22};
 		String tekst = "";
 		List<String> dane = pozycje.get(0);
 		
@@ -71,11 +74,16 @@ public class BibliotekaWspolnychMetod {
 		for (String linia: linie){
 			List<String> wypelnionePola = new ArrayList<>();
 //			System.out.println(linia);
+//			System.out.println(linia);
 			String[] dana = linia.split(";");
-//			System.out.println(dana);
-			for (int i=dane.getZakres().a;i<dane.getZakres().b;i++){
+//			for (String s:dana) System.out.println(s+"|");
+//			System.out.println(dana.length);
+			
+//			for (int i=0;i<dane.getZakres().a;i++) wypelnionePola.add("!");
+			for (int i=dane.getZakres().a;i<dana.length;i++){//!!!
 				wypelnionePola.add(dana[i]);
 			}
+			for (int i=dana.length;i<dane.getZakres().b;i++) wypelnionePola.add("");
 			dane.add(wypelnionePola);
 		}
 		return dane;
@@ -85,7 +93,7 @@ public class BibliotekaWspolnychMetod {
 		String[] zakladki = new String[3];
 		Scanner sc = null;
 		try {
-			sc = new Scanner(new File(sciezka));
+			sc = new Scanner(new FileInputStream(sciezka),"UTF-8");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -97,10 +105,16 @@ public class BibliotekaWspolnychMetod {
 		zakladki[0] = danePodstawowe;
 //		System.out.println(danePodstawowe);
 		String sprzedaze = "";
+//		System.out.println(danePodstawowe);
+		//...
+		//sc.next();
+		//while (sc.hasNext()) System.out.println(sc.next());
+		///..
 		while (true){
 //			System.out.println("-");
 			String linia = sc.nextLine();
-			if (linia.startsWith(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")) break;
+//			System.out.println(linia);
+			if (linia.startsWith(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")) break;
 			sprzedaze += linia+"\n";
 		}
 		zakladki[1] = sprzedaze;
@@ -108,7 +122,7 @@ public class BibliotekaWspolnychMetod {
 		String zakupy = "";
 		while (true){
 			String linia = sc.nextLine();
-			if (linia.startsWith(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")) break;
+			if (linia.startsWith(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")) break;
 			zakupy += linia+"\n";
 		}
 		zakladki[2] = zakupy;
@@ -135,16 +149,17 @@ public class BibliotekaWspolnychMetod {
 	}
 
 	public static Zakladka importujZeStringDanePodstawowe(String tekst) {
-		int[] indexy = {0,9,12,22};
+		
 		Zakladka zakladka = new Zakladka(Zakres.PODSTAWOWE_DANE);
 		List<String> wypelnionePola = new ArrayList<>();
 		String[] linie = tekst.split("\n");
 		String[] pierwszaLinia = linie[0].split(";");
-		for (int i=indexy[0];i<indexy[1];i++) wypelnionePola.add(pierwszaLinia[i]);
+		for (int i=indexy[0];i<pierwszaLinia.length;i++) wypelnionePola.add(pierwszaLinia[i]);
 		String[] drugaLinia = linie[1].split(";");
-		for (int i=indexy[1];i<indexy[2];i++) wypelnionePola.add(drugaLinia[i]);
-		String[] trzeciaLinia = linie[2].split(";");
-		for (int i=indexy[2];i<indexy[3];i++) wypelnionePola.add(trzeciaLinia[i]);
+		for (int i=indexy[1];i<drugaLinia.length;i++) wypelnionePola.add(drugaLinia[i]);
+//		String[] trzeciaLinia = linie[2].split(";");
+//		for (int i=indexy[2];i<trzeciaLinia.length;i++) wypelnionePola.add(trzeciaLinia[i]);
+		zakladka.add(wypelnionePola);
 		return zakladka;
 	}
 }
