@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class BibliotekaWspolnychMetod {
 	
-	private final static int[] indexy = {0,9,11};
+	private final static int[] indexy = {0,9,12};
 	
 	public static List<String> pobierzTytulyKolumn(Zakres zakres){
 		ArrayList<String> lista = new ArrayList<>();
@@ -58,7 +58,7 @@ public class BibliotekaWspolnychMetod {
 			for (String uzupelnionePole: p){
 				tekstDoZapisania+=uzupelnionePole+";";
 			}
-			for (int i=0;i<Zakres._WSZYSTKIE_.b-zakres.b;i++){
+			for (int i=0;i<Zakres._WSZYSTKIE_.b-1-zakres.b;i++){
 				tekstDoZapisania+=";";
 			}
 			tekstDoZapisania+="\n";//UWAGA mie wiem jaki znak konca lini :-(
@@ -118,7 +118,7 @@ public class BibliotekaWspolnychMetod {
 			sprzedaze += linia+"\n";
 		}
 		zakladki[1] = sprzedaze;
-		sc.nextLine();
+//		sc.nextLine();
 		String zakupy = "";
 		while (true){
 			String linia = sc.nextLine();

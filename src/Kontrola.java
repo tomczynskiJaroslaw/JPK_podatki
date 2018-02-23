@@ -31,10 +31,12 @@ public class Kontrola implements ActionListener{
 			String podliczenieSprzedazy = podliczenieSprzedazy(okno.getSprzedaze(),Zakres.SPRZEDAZ);
 //			String linia = "\n;...\n";
 			String podliczenieZakupow = podliczenieSprzedazy(okno.getZakupy(),Zakres.ZAKUP);
-			
+			System.out.println("--->"+okno.getDodstawoweDane());
+			System.out.println(dane_podstawowe);
 			BibliotekaWspolnychMetod.zapiszStringDoPliku(
 					tytulyKolumnZamienNaPierwszaLinie(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres._WSZYSTKIE_))
 					+"\n"+dane_podstawowe
+					+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n"
 					+sprzedaze
 					+podliczenieSprzedazy
 //					+linia
@@ -48,6 +50,7 @@ public class Kontrola implements ActionListener{
 			System.out.println(zakladki[0]+"\n---\n"+zakladki[1]+"\n---\n"+zakladki[2]);
 			Zakladka danePodstawowe = BibliotekaWspolnychMetod.importujZeStringDanePodstawowe(zakladki[0]);
 			Zakladka sprzedaze = BibliotekaWspolnychMetod.importZeString(zakladki[1],Zakres.SPRZEDAZ);
+			System.out.println("-->"+zakladki[1]);
 			Zakladka zakupy = BibliotekaWspolnychMetod.importZeString(zakladki[2],Zakres.ZAKUP);
 			okno.importujDanePodstawowe(danePodstawowe);
 			System.out.println(danePodstawowe);
@@ -70,6 +73,7 @@ public class Kontrola implements ActionListener{
 		String tekst = "";
 		for (int i=0;i<zakres.b;i++) tekst+=";";
 		tekst+=sprzedaze.size();
+		tekst+=";";
 		double suma = 0;
 		for (List<String> a : sprzedaze){
 			for (int i : zakres.indexyKolumnZPodatkiem){
@@ -77,11 +81,9 @@ public class Kontrola implements ActionListener{
 				if(!kwota.equals("")) suma += Double.parseDouble(kwota.replace(',', '.')); 
 			}
 		}
-		tekst+=";";
-		tekst+=String.format( "%.2f", suma );
-//		suma;//UWAGA ./,
-		for (int i=0;i<Zakres._WSZYSTKIE_.b-zakres.b;i++) tekst+=";";
-		tekst.replaceAll(".", ",");//!!!
+//		tekst+=";";
+		tekst+=String.format( "%.2f", suma ).replace('.', ',');
+		for (int i=0;i<Zakres._WSZYSTKIE_.b-zakres.b-2;i++) tekst+=";";
 		return tekst;
 	}
 }
