@@ -130,6 +130,7 @@ public class BibliotekaWspolnychMetod {
 	}
 	
 	public static void zapiszStringDoPliku(String tekst,String nazwaPliku){
+		tekst = ""+tekst;//"﻿" ???
 		FileWriter fw = null ;
 		try {
 			fw = new FileWriter(new File(nazwaPliku));
