@@ -163,4 +163,15 @@ public class BibliotekaWspolnychMetod {
 		zakladka.add(wypelnionePola);
 		return zakladka;
 	}
+	
+	public static double obliczPodatek(List<List<String>> sprzedaze, Zakres zakres) {
+		double suma = 0;
+		for (List<String> a : sprzedaze){
+			for (int i : zakres.indexyKolumnZPodatkiem){
+				String kwota = a.get(i-zakres.a);
+				if(!kwota.equals("")) suma += Double.parseDouble(kwota.replace(',', '.')); 
+			}
+		}
+		return suma;
+	}
 }

@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
@@ -24,6 +26,7 @@ public class Okno{
 		czy dodaj pozycje powinna zwracac panel z pozycjami, a grupa miec wewenatrzna liste pozycji?
 	3. Czy dodac typ Zakladka extends List { Zakres zakres; } ? 
 	*/
+	private final int minSzerokoscPola=300;
 	private final int ileMiejsc = 1;
 	private JButton importuj = new JButton("importuj");
 	private JButton zapisz = new JButton("zapisz");
@@ -38,13 +41,23 @@ public class Okno{
 //		JFrame okienko = new JFrame();
 		JTabbedPane jtp = new JTabbedPane();
 		
+//		dodajLegende(danePodstawowe);
+//		dodajLegende(wszystkieSprzedaze);
+//		dodajLegende(wszystkieZakupy);
+		
 		danePodstawowe = zrobZakladke(Zakres.PODSTAWOWE_DANE);
 		wszystkieSprzedaze = zrobZakladke(Zakres.SPRZEDAZ);
 		wszystkieZakupy = zrobZakladke(Zakres.ZAKUP);
 		
-		jtp.addTab("podstawowe dane", danePodstawowe);
-		jtp.addTab("sprzedaze", wszystkieSprzedaze);
-		jtp.addTab("zakupy", wszystkieZakupy);
+		
+		JScrollPane d = new JScrollPane(danePodstawowe);
+		JScrollPane s = new JScrollPane(wszystkieSprzedaze);
+		JScrollPane z = new JScrollPane(wszystkieZakupy);
+		
+		
+		jtp.addTab("podstawowe dane", d);
+		jtp.addTab("sprzedaze", s);
+		jtp.addTab("zakupy", z);
 		
 		okienko.setLayout(new BorderLayout());
 		okienko.add(jtp);
@@ -62,10 +75,14 @@ public class Okno{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				Grupa panel = (Grupa) jtp.getSelectedComponent();
+				Grupa panel = getAktywnaZakladka(jtp);
 //				System.out.println(panel);
 				panel = dodajPozycje(panel);
 				okienko.validate();
+				
+//				danePodstawowe.getComponent(1).setVisible(false);
+//				((JPanel) danePodstawowe.getComponent(0)).getComponent(1).setVisible(false);
+//				okienko.validate();
 			}
 		});
 		
@@ -73,11 +90,21 @@ public class Okno{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Grupa panel = (Grupa) jtp.getSelectedComponent();
+				Grupa panel = getAktywnaZakladka(jtp);
 				panel = usunPozycje(panel);
 				okienko.validate();
 			}
 		});
+	}
+
+
+
+	private void dodajLegende(Grupa grupa) {
+		JPanel legenda = new JPanel();
+		List<JPanel> opisyPol = produkujLegende(BibliotekaWspolnychMetod.pobierzTytulyKolumn(grupa.getZakres()));
+		legenda.setLayout(new GridLayout(opisyPol.size(), 1));
+		for (JPanel p : opisyPol) legenda.add(p);
+		grupa.add(legenda);
 	}
 	
 
@@ -89,6 +116,7 @@ public class Okno{
 	private Grupa zrobZakladke(Zakres zakres,List<String> wypelnionePolaPozycji) {
 		Grupa wszystkiePozycje = new Grupa(zakres);
 		wszystkiePozycje.setLayout(new GridLayout(1, ileMiejsc));
+		dodajLegende(wszystkiePozycje);
 		return dodajPozycje(wszystkiePozycje,wypelnionePolaPozycji);
 	}
 	
@@ -98,11 +126,13 @@ public class Okno{
 	
 	private Grupa dodajPozycje(Grupa panel,List<String> wypelnionePolaPozycji){
 		Grupa wszystkiePozycje = panel;
+		
 		int ilePozycji = ((GridLayout) wszystkiePozycje.getLayout()).getColumns();
-		wszystkiePozycje.setLayout(new GridLayout(1, ilePozycji+1));
+		wszystkiePozycje.setLayout(new GridLayout(1,ilePozycji+1));//!!!!!!
 		List<JPanel> pola = produkujPanele(BibliotekaWspolnychMetod.pobierzTytulyKolumn(panel.getZakres()),wypelnionePolaPozycji);
 		JPanel pozycja = new JPanel();
-		pozycja.setLayout(new GridLayout(pola.size()/*<-!!!!*/, 1));
+//		pozycja.set(new Dimension(minSzerokoscPola, 10));
+		pozycja.setLayout(new GridLayout(pola.size(), 1));
 		for (JPanel p: pola){
 			pozycja.add(p);
 		}
@@ -134,10 +164,23 @@ public class Okno{
 			JPanel panel = new JPanel();
 			JLabel tytul = new JLabel(s);
 			JTextField wprowadzDane = new JTextField();
+			//wprowadzDane.setMinimumSize(new Dimension(minSzerokoscPola, 10));
 			if (wypelnionePola != null) wprowadzDane.setText(i.next());
-			panel.setLayout(new GridLayout(1, 2));
-			panel.add(tytul);
+			panel.setLayout(new GridLayout(1, 1));
+//			panel.add(tytul);
 			panel.add(wprowadzDane);
+			panele.add(panel);
+		}
+		return panele;
+	}
+	
+	public List<JPanel> produkujLegende(List<String> opisyPolFormularza){
+		ArrayList<JPanel> panele = new ArrayList<>();
+		for (String s : opisyPolFormularza) {
+			JPanel panel = new JPanel();
+			JLabel tytul = new JLabel(s);
+			panel.setLayout(new GridLayout(1, 1));
+			panel.add(tytul);
 			panele.add(panel);
 		}
 		return panele;
@@ -158,13 +201,13 @@ public class Okno{
 	public List<List<String>> getWpisaneDane(JPanel panel){
 		ArrayList<List<String>> danePozycje = new ArrayList<>();
 		Component[] panele = panel.getComponents();
-		for (Component c: panele){
-			JPanel p1 = (JPanel) c;
+		for (int i=1;i<panele.length;i++){
+			JPanel p1 = (JPanel) panele[i];
 			Component[] wiersze = p1.getComponents();
 			List<String> uzupelnionePola = new ArrayList<>();
 			for (Component w: wiersze){
 				JPanel p2 = (JPanel) w;
-				String dana = ((JTextField) p2.getComponents()[1]).getText();
+				String dana = ((JTextField) p2.getComponents()[0]).getText();
 				uzupelnionePola.add(dana);
 			}
 			danePozycje.add(uzupelnionePola);
@@ -228,5 +271,9 @@ public class Okno{
 	
 	public void odswiezOkienko(){
 		okienko.validate();
+	}
+	
+	public Grupa getAktywnaZakladka(JTabbedPane jtp){
+		return (Grupa) ((JScrollPane) jtp.getSelectedComponent()).getViewport().getView();
 	}
 }

@@ -22,28 +22,30 @@ public class Kontrola implements ActionListener{
 		JButton b = (JButton) e.getSource();
 		String nazwa = b.getText();
 		if (nazwa.equals("zapisz")){
-			System.out.println("zapisz");
-
-			String dane_podstawowe = BibliotekaWspolnychMetod.exportDoStringDanePodstawowe(okno.getDodstawoweDane());
-			String sprzedaze = BibliotekaWspolnychMetod.exportDoString(okno.getSprzedaze(),Zakres.SPRZEDAZ);
-			String zakupy = BibliotekaWspolnychMetod.exportDoString(okno.getZakupy(),Zakres.ZAKUP);
+//			System.out.println("zapisz");
+//
+//			String dane_podstawowe = BibliotekaWspolnychMetod.exportDoStringDanePodstawowe(okno.getDodstawoweDane());
+//			String sprzedaze = BibliotekaWspolnychMetod.exportDoString(okno.getSprzedaze(),Zakres.SPRZEDAZ);
+//			String zakupy = BibliotekaWspolnychMetod.exportDoString(okno.getZakupy(),Zakres.ZAKUP);
+//			
+//			String podliczenieSprzedazy = podliczenieSprzedazy(okno.getSprzedaze(),Zakres.SPRZEDAZ);
+////			String linia = "\n;...\n";
+//			String podliczenieZakupow = podliczenieSprzedazy(okno.getZakupy(),Zakres.ZAKUP);
+//			System.out.println("--->"+okno.getDodstawoweDane());
+//			System.out.println(dane_podstawowe);
+//			BibliotekaWspolnychMetod.zapiszStringDoPliku(
+//					tytulyKolumnZamienNaPierwszaLinie(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres._WSZYSTKIE_))
+//					+"\n"+dane_podstawowe
+//					+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n"
+//					+sprzedaze
+//					+podliczenieSprzedazy
+////					+linia
+//					+"\n"
+//					+zakupy
+//					+podliczenieZakupow
+//					, "plik.csv");
 			
-			String podliczenieSprzedazy = podliczenieSprzedazy(okno.getSprzedaze(),Zakres.SPRZEDAZ);
-//			String linia = "\n;...\n";
-			String podliczenieZakupow = podliczenieSprzedazy(okno.getZakupy(),Zakres.ZAKUP);
-			System.out.println("--->"+okno.getDodstawoweDane());
-			System.out.println(dane_podstawowe);
-			BibliotekaWspolnychMetod.zapiszStringDoPliku(
-					tytulyKolumnZamienNaPierwszaLinie(BibliotekaWspolnychMetod.pobierzTytulyKolumn(Zakres._WSZYSTKIE_))
-					+"\n"+dane_podstawowe
-					+";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n"
-					+sprzedaze
-					+podliczenieSprzedazy
-//					+linia
-					+"\n"
-					+zakupy
-					+podliczenieZakupow
-					, "plik.csv");
+			
 		}
 		if (nazwa.equals("importuj")){
 			String[] zakladki = BibliotekaWspolnychMetod.wczytaj("wzor2.csv");
@@ -57,6 +59,8 @@ public class Kontrola implements ActionListener{
 			okno.importujSprzedaze(sprzedaze);
 			okno.importujZakupy(zakupy);
 			okno.odswiezOkienko();
+			
+			XML.zapiszDoXML(XML.generujElementy(danePodstawowe, sprzedaze, zakupy));
 		}
 		
 	}
@@ -74,16 +78,12 @@ public class Kontrola implements ActionListener{
 		for (int i=0;i<zakres.b;i++) tekst+=";";
 		tekst+=sprzedaze.size();
 		tekst+=";";
-		double suma = 0;
-		for (List<String> a : sprzedaze){
-			for (int i : zakres.indexyKolumnZPodatkiem){
-				String kwota = a.get(i-zakres.a);
-				if(!kwota.equals("")) suma += Double.parseDouble(kwota.replace(',', '.')); 
-			}
-		}
+		double suma = BibliotekaWspolnychMetod.obliczPodatek(sprzedaze, zakres);
 //		tekst+=";";
 		tekst+=String.format( "%.2f", suma ).replace('.', ',');
 		for (int i=0;i<Zakres._WSZYSTKIE_.b-zakres.b-2;i++) tekst+=";";
 		return tekst;
 	}
+
+
 }
